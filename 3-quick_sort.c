@@ -1,73 +1,85 @@
 #include "sort.h"
 
 /**
- * Lumoto_partition - partitions an array using the Lomuto scheme
- * @array: the array to partition
- * @low: the lower index of the partition
- * @high: the upper index of the partition
- * @size: the size of the array
- * Return: the index of the pivot
+ * swap - swaps two variables
+ * @i: first one to swap
+ * @j: second one to swap
  */
 
-int Lumoto_partition(int *array, int low, int high, size_t size)
+void swap(int *i, int *j)
 {
-	int pivot, i, j, temp;
+	int tmp = *i;
 
-	pivot = array[high];
+	*i = *j;
+	*j = tmp;
+}
+
+/**
+ * partition - Lomuto parition
+ * @array: array to start
+ * @low: lowest value
+ * @hi: highest value
+ * @size: size of array
+ * Return: pivot
+ *
+ */
+
+int partition(int *array, ssize_t low, ssize_t hi, size_t size)
+{
+	ssize_t i, j;
+	int pivot;
+
+	pivot = array[hi];
 	i = low - 1;
-	for (j = low; j < high; j++)
+	for (j = low; j < hi; j++)
 	{
-		if (array[j] <= pivot)
+		if (array[j] < pivot)
 		{
 			i++;
 			if (i != j)
 			{
-				temp = array[i];
-				array[i] = array[j];
-				array[j] = temp;
+				swap(&array[i], &array[j]);
 				print_array(array, size);
 			}
 		}
 	}
-	if (array[high] < array[i + 1])
+	if (array[hi] < array[i + 1])
 	{
-		temp = array[i + 1];
-		array[i + 1] = array[high];
-		array[high] = temp;
+		swap(&array[i + 1], &array[j]);
 		print_array(array, size);
 	}
 	return (i + 1);
 }
 
 /**
- * quick_sort - sorts an array of integers in ascending order
- * using the Quick sort algorithm
- * @array: the array to sort
- * @size: the size of the array
+ * lomuto_scheme - uses lomuto scheme to sort array
+ * @arr: array to be sorted
+ * @low: lowest value
+ * @high: highest value -- pivot
+ * @size: size of the array
+ */
+void lomuto_scheme(int *arr, int low, int high, size_t size)
+{
+	int i;
+
+	if (low < high)
+	{
+		i = partition(arr, low, high, size);
+		lomuto_scheme(arr, low, i - 1, size);
+		lomuto_scheme(arr, i + 1, high, size);
+	}
+}
+
+/**
+ * quick_sort - sorts arr of ints in ascending order using quick sort
+ * @array: array to be sorted
+ * @size: size of the array
+ * Return: void
  */
 
 void quick_sort(int *array, size_t size)
 {
-	int low, high;
-
-	if (array == NULL || size < 2)
+	if (!array || size < 2)
 		return;
-
-	low = 0;
-	high = size - 1;
-	while (low < high)
-	{
-		int pivot = Lumoto_partition(array, low, high, size);
-
-		if (pivot - low < high - pivot)
-		{
-			quick_sort(array, pivot);
-			low = pivot + 1;
-		}
-		else
-		{
-			quick_sort(array + pivot + 1, high - pivot);
-			high = pivot - 1;
-		}
-	}
+	lomuto_scheme(array, 0, size - 1, size);
 }
